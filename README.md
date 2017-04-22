@@ -12,7 +12,7 @@ Will check if `$HOME` is set.
 
 ## Installation
 ```
-$ go get github.com/soudy/epp
+$ go get github.com/blendle/epp
 ```
 
 Or download the latest release.
