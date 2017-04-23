@@ -10,4 +10,5 @@ build:
 
 release:
 	mkdir -p bin
-	go build -ldflags "-s -w $(LDFLAGS)" -o $(BINARY)
+	GOOS=linux GOARCH=amd64 go build -ldflags "-s -w $(LDFLAGS)" -o $(BINARY)
+	GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w $(LDFLAGS)" -o $(BINARY)_darwin64
