@@ -46,7 +46,7 @@ func main() {
 	}
 
 	if *output == "" {
-		fmt.Printf(string(out))
+		fmt.Print(string(out))
 		return
 	}
 

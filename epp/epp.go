@@ -1,41 +1,25 @@
 package epp
 
 import (
-	"encoding/base64"
-	"os"
-	"strings"
+	"bytes"
+	"text/template"
 
-	"github.com/flosch/pongo2"
+	"github.com/Masterminds/sprig"
 )
-
-func init() {
-	pongo2.RegisterFilter("b64enc", filterBase64Encode)
-}
 
 // Parse parses the input and returns the output
 func Parse(input []byte) ([]byte, error) {
-	tpl, err := pongo2.FromString(string(input))
+	var writer bytes.Buffer
+
+	tpl, err := template.New("test").Funcs(sprig.TxtFuncMap()).Parse(string(input))
 	if err != nil {
 		return nil, err
 	}
 
-	context := environToContext()
-	return tpl.ExecuteBytes(context)
-}
-
-func environToContext() pongo2.Context {
-	ctx := pongo2.Context{}
-
-	for _, env := range os.Environ() {
-		variable := strings.SplitN(env, "=", 2)
-		key, value := variable[0], variable[1]
-
-		ctx[key] = value
+	err = tpl.Execute(&writer, map[string]interface{}{})
+	if err != nil {
+		return nil, err
 	}
 
-	return ctx
-}
-
-func filterBase64Encode(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	return pongo2.AsValue(base64.StdEncoding.EncodeToString([]byte(in.String()))), nil
+	return writer.Bytes(), nil
 }
