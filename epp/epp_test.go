@@ -48,3 +48,20 @@ I should!
 		t.Errorf("bad expansion: expected '%s', got '%s'", expected, res)
 	}
 }
+
+func TestInclude(t *testing.T) {
+	tpl := []byte(`{{ define "worldtpl" }}world{{- end }}
+hello {{ include "worldtpl" . | upper }}`)
+	expected := `
+hello WORLD`
+
+	res, err := Parse(tpl)
+
+	if err != nil {
+		t.Errorf("unexpected error '%s'", err)
+	}
+
+	if string(res) != expected {
+		t.Errorf("bad expansion: expected '%s', got '%s'", expected, res)
+	}
+}

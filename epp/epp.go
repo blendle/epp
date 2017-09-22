@@ -10,8 +10,19 @@ import (
 // Parse parses the input and returns the output
 func Parse(input []byte) ([]byte, error) {
 	var writer bytes.Buffer
+	t := template.New("test")
 
-	tpl, err := template.New("test").Funcs(sprig.TxtFuncMap()).Parse(string(input))
+	funcMap := template.FuncMap{
+		"include": func(name string, data interface{}) (string, error) {
+			buf := bytes.NewBuffer(nil)
+			if err := t.ExecuteTemplate(buf, name, data); err != nil {
+				return "", err
+			}
+			return buf.String(), nil
+		},
+	}
+
+	tpl, err := t.Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(string(input))
 	if err != nil {
 		return nil, err
 	}
