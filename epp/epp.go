@@ -2,6 +2,7 @@ package epp
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
@@ -19,6 +20,17 @@ func Parse(input []byte) ([]byte, error) {
 				return "", err
 			}
 			return buf.String(), nil
+		},
+
+		"required": func(warn string, val interface{}) (interface{}, error) {
+			if val == nil {
+				return val, fmt.Errorf(warn)
+			} else if _, ok := val.(string); ok {
+				if val == "" {
+					return val, fmt.Errorf(warn)
+				}
+			}
+			return val, nil
 		},
 	}
 

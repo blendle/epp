@@ -3,6 +3,7 @@ package epp
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -63,5 +64,33 @@ hello WORLD`
 
 	if string(res) != expected {
 		t.Errorf("bad expansion: expected '%s', got '%s'", expected, res)
+	}
+}
+
+func TestRequired(t *testing.T) {
+	tpl := []byte(`{{ required "undefined" "hello" }}`)
+	expected := `hello`
+
+	res, err := Parse(tpl)
+
+	if err != nil {
+		t.Errorf("unexpected error '%s'", err)
+	}
+
+	if string(res) != expected {
+		t.Errorf("bad expansion: expected '%s', got '%s'", expected, res)
+	}
+}
+
+func TestRequired_Undefined(t *testing.T) {
+	tpl := []byte(`{{ required "undefined" .Undefined }}`)
+	_, err := Parse(tpl)
+
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+	if !strings.Contains(err.Error(), "error calling required: undefined") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
