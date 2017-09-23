@@ -1,6 +1,6 @@
 BINARY=bin/epp
 
-VERSION=$(shell git for-each-ref refs/tags --sort=-taggerdate --format='%(refname:short)' --count=1)
+VERSION=$(shell git for-each-ref refs/tags --sort=-committerdate --format='%(refname:short)' --count=1)
 GIT_COMMIT=`git rev-parse @`
 LDFLAGS=-X main.Version=$(VERSION) -X main.GitCommit=$(GIT_COMMIT)
 
