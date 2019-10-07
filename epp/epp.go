@@ -3,13 +3,17 @@ package epp
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"path/filepath"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
 )
 
+const DefaultPartialsPath = "config/deploy/partials"
+
 // Parse parses the input and returns the output
-func Parse(input []byte) ([]byte, error) {
+func Parse(input []byte, partialPath string) ([]byte, error) {
 	var writer bytes.Buffer
 	t := template.New("test")
 
@@ -34,15 +38,49 @@ func Parse(input []byte) ([]byte, error) {
 		},
 	}
 
-	tpl, err := t.Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(string(input))
+	err := loadTemplates(t, partialPath)
 	if err != nil {
 		return nil, err
 	}
 
-	err = tpl.Execute(&writer, map[string]interface{}{})
+	t, tplErr := t.Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(string(input))
+	if tplErr != nil {
+		return nil, err
+	}
+
+	err = t.Execute(&writer, map[string]interface{}{})
 	if err != nil {
 		return nil, err
 	}
 
 	return writer.Bytes(), nil
+}
+
+func loadTemplates(t *template.Template, partialPath string) (error) {
+	if partialPath == DefaultPartialsPath {
+		if _, err := os.Stat(partialPath); os.IsNotExist(err) {
+			return nil
+		}
+	}
+
+	if partialPath == "" {
+		return nil
+	}
+
+	var templatePaths []string
+	err := filepath.Walk(partialPath, func(path string, f os.FileInfo, err error) error {
+		if info, e := os.Stat(path); e == nil && info.IsDir() {
+			return nil
+		}
+		templatePaths = append(templatePaths, path)
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	t, err = t.ParseFiles(templatePaths...)
+	return err
 }

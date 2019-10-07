@@ -18,6 +18,7 @@ var (
 
 	output  = flag.String("o", "", "output file")
 	version = flag.Bool("version", false, "print epp version")
+	partialsDir = flag.String("partials-dir", epp.DefaultPartialsPath, "pass the path to your partials directory")
 )
 
 func main() {
@@ -39,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	out, err := epp.Parse(fileContents)
+	out, err := epp.Parse(fileContents, *partialsDir)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "templating error: %s\n", err)
 		os.Exit(1)
