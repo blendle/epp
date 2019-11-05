@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/blendle/epp/epp"
 )
@@ -16,8 +18,8 @@ var (
 	// GitCommit of the application
 	GitCommit string
 
-	output  = flag.String("o", "", "output file")
-	version = flag.Bool("version", false, "print epp version")
+	output      = flag.String("o", "", "output file")
+	version     = flag.Bool("version", false, "print epp version")
 	partialsDir = flag.String("partials-dir", epp.DefaultPartialsPath, "pass the path to your partials directory")
 )
 
@@ -63,5 +65,21 @@ func readInput(input string) ([]byte, error) {
 		return ioutil.ReadAll(os.Stdin)
 	}
 
-	return ioutil.ReadFile(input)
+	inputFileNames, err := filepath.Glob(input)
+	if err != nil {
+		return nil, fmt.Errorf("we couldn't glob the provided path: %v", err)
+	}
+
+	allContent := bytes.Buffer{}
+
+	for _, fileName := range inputFileNames {
+		content, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			return nil, fmt.Errorf("unable to read input file: %s - %v", fileName, err)
+		}
+
+		allContent.Write(content)
+	}
+
+	return allContent.Bytes(), nil
 }

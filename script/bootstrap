@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# script/bootstrap: Resolve all dependencies that the application requires to run.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+if ! command -v golangci-lint >/dev/null; then
+  if [ -z "${CI:-}" ]; then
+    echo 'You need to install golangci-lint as a dependency, run this command:'
+    echo '$ go get -u github.com/golangci/golangci-lint/cmd/golangci-lint'
+  else
+    echo "Installing golangci-lint at $(go env GOPATH)/bin"
+    curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b "$(go env GOPATH)/bin" v1.21.0
+  fi
+fi
