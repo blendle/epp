@@ -56,7 +56,7 @@ func Parse(input []byte, partialPath string) ([]byte, error) {
 	return writer.Bytes(), nil
 }
 
-func loadTemplates(t *template.Template, partialPath string) (error) {
+func loadTemplates(t *template.Template, partialPath string) error {
 	if partialPath == DefaultPartialsPath {
 		if _, err := os.Stat(partialPath); os.IsNotExist(err) {
 			return nil
@@ -81,6 +81,6 @@ func loadTemplates(t *template.Template, partialPath string) (error) {
 		return err
 	}
 
-	t, err = t.ParseFiles(templatePaths...)
+	_, err = t.ParseFiles(templatePaths...)
 	return err
 }
