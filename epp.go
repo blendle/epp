@@ -75,7 +75,7 @@ func readInput(input string) ([]byte, error) {
 	for _, fileName := range inputFileNames {
 		content, err := ioutil.ReadFile(fileName)
 		if err != nil {
-			return nil, fmt.Errorf("we couldn't input file: %v - %v", fileName, err)
+			return nil, fmt.Errorf("unable to read input file: %s - %v", fileName, err)
 		}
 
 		allContent.Write(content)
