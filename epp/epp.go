@@ -38,13 +38,13 @@ func Parse(input []byte, partialPath string) ([]byte, error) {
 		},
 	}
 
-	err := loadTemplates(t, partialPath)
+	t, err := t.Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(string(input))
 	if err != nil {
 		return nil, err
 	}
 
-	t, tplErr := t.Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(string(input))
-	if tplErr != nil {
+	err = loadTemplates(t, partialPath)
+	if err != nil {
 		return nil, err
 	}
 

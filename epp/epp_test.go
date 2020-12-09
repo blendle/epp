@@ -124,3 +124,18 @@ func TestPartialDir(t *testing.T) {
 		t.Errorf("bad expansion: expected '%s', got '%s'", expected, res)
 	}
 }
+
+func TestPartialFunctions(t *testing.T) {
+	tpl := []byte(`{{ include "recursive_partial" . }}`)
+	expected := `Hello,world`
+
+	res, err := Parse(tpl, "../resources")
+
+	if err != nil {
+		t.Errorf("unexpected error '%s'", err)
+	}
+
+	if string(res) != expected {
+		t.Errorf("bad expansion: expected '%s', got '%s'", expected, res)
+	}
+}
